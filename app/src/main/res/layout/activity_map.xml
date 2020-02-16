@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:onClick="openUser"
+                app:cardCornerRadius="25dp">
+
+                <ImageView
+                    android:id="@+id/userImageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/user_button" />
+
+            </androidx.cardview.widget.CardView>
+
+            <ImageView
+                android:id="@+id/locateButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="-10dp"
+                android:background="?android:selectableItemBackground"
+                android:onClick="locate"
+                android:scaleType="centerCrop"
+                android:src="@drawable/locate_button" />
+
+            <ImageView
+                android:id="@+id/addButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?android:selectableItemBackground"
+                android:onClick="addFuente"
+                android:scaleType="centerCrop"
+                android:src="@drawable/add_button" />
+
+        </LinearLayout>
+
+
+    </fragment>
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bottom_sheet"
+        android:orientation="vertical"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="60dp">
+
+
+        <LinearLayout
+            android:id="@+id/fontListLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="right">
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="5dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_round"
+                android:backgroundTint="#7F7F7F" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/raleway_thin"
+                android:text="@string/NearWaterSources"
+                android:textAlignment="center" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

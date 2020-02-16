@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="START">EMPEZAR</string>
+    <string name="tut1">La app para mantenerse hidratado</string>
+    <string name="tut2.1.1">Busca las fuentes</string>
+    <string name="tut2.1.2">más cercanas</string>
+    <string name="tut2.2.1">Añade nuevas fuentes</string>
+    <string name="tut2.2.2">que no estén aún</string>
+    <string name="tut3">Recuerda mantenerte hidratado</string>
+    <string name="signin">Iniciar sesión</string>
+    <string name="no_location">Lo sentimos, ésta aplicación necesita permisos de ubicación para funcionar</string>
+    <string name="NearWaterSources">fuentes cercanas</string>
+    <string name="created_by">Creada por</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="report">informar de un problema</string>
+    <string name="no_description">Esta fuente no tiene descripción. Sé el primero en añadir una.</string>
+    <string name="description">Descripción</string>
+    <string name="name">Nombre</string>
+    <string name="location">Ubicación</string>
+    <string name="addPhoto">Añadir foto</string>
+    <string name="newWaterSource">Nueva fuente</string>
+    <string name="cancel">cancelar</string>
+    <string name="create">Crear</string>
+    <string name="nameRequired">Nombre requerido</string>
+    <string name="locationRequired">Ubicación requerida</string>
+    <string name="photoAdded">Foto añadida!</string>
+    <string name="accept">aceptar</string>
+    <string name="errorTryAgainLater">Error, vuelve a internarlo más tarde</string>
+    <string name="Done">Hecho</string>
+    <string name="Anonymous">Anónimo</string>
+</resources>

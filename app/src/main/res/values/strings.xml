@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name" translatable="false">IDRA</string>
+    <string name="START">START</string>
+    <string name="title_activity_map" translatable="false">Map</string>
+    <string name="tut1">The app to stay hydrated</string>
+    <string name="tut2.1.1">Look for drinking water sources</string>
+    <string name="tut2.1.2">closer to you</string>
+    <string name="tut2.2.1">Add new water sources</string>
+    <string name="tut2.2.2">that are not yet</string>
+    <string name="tut3">Remember to stay hydrated</string>
+    <string name="signin">sign in</string>
+    <string name="no_location">This app needs location permission to work</string>
+    <string name="NearWaterSources">nearby</string>
+    <string name="created_by">Created By</string>
+    <string name="logout">logout</string>
+    <string name="report">report a problem</string>
+    <string name="no_description">This water source does not have description. Be the first to write one.</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="location">Location</string>
+    <string name="addPhoto">Add photo</string>
+    <string name="newWaterSource">New water source</string>
+    <string name="cancel">cancel</string>
+    <string name="create">Create</string>
+    <string name="nameRequired">Name required</string>
+    <string name="locationRequired">Location required</string>
+    <string name="photoAdded">Photo added!</string>
+    <string name="accept">accept</string>
+    <string name="errorTryAgainLater">Error, try again later</string>
+    <string name="Done">Done</string>
+    <string name="Anonymous">Anonymous</string>
+</resources>

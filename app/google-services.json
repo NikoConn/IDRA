@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "938084351062",
+    "firebase_url": "https://idra-c47bb.firebaseio.com",
+    "project_id": "idra-c47bb",
+    "storage_bucket": "idra-c47bb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938084351062:android:abe8e112b88ddcc5e2cff7",
+        "android_client_info": {
+          "package_name": "com.nicog.idra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938084351062-7doq5rtam70k2s287cdpqtjkk7h9oh1d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nicog.idra",
+            "certificate_hash": "25449dd44dc867bb32a3af3f2a689353969656f7"
+          }
+        },
+        {
+          "client_id": "938084351062-hgkp1hpirgj86am2qf9s0q7gi6tqsnrv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvoXKCWkKpfAvvfk-Lkl2vhKSGhTUZTew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938084351062-hgkp1hpirgj86am2qf9s0q7gi6tqsnrv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
