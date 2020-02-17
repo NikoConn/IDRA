@@ -18,7 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Interface.addLocation"></activity>
-        <activity android:name=".Interface.selectOnMap" />
         <activity
             android:name=".Interface.addFuente"
             android:screenOrientation="portrait" />

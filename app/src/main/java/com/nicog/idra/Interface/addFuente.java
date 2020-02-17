@@ -1,6 +1,8 @@
 package com.nicog.idra.Interface;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -59,12 +61,18 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     public void addPhoto(View v){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        /*Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         String[] mimeTypes = {"image/jpeg", "image/png"};
         photoPickerIntent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
         // Launching the Intent
-        startActivityForResult(photoPickerIntent,2);
+        startActivityForResult(photoPickerIntent,2);*/
+        /*if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, 1888);
+        }
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, 123);*/
     }
 
     public void addLocation(){
