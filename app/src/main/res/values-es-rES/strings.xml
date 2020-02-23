@@ -28,4 +28,9 @@
     <string name="errorTryAgainLater">Error, vuelve a internarlo más tarde</string>
     <string name="Done">Hecho</string>
     <string name="Anonymous">Anónimo</string>
+    <string name="SelectPhoto">Selecciona una foto</string>
+    <string name="Gallery">Galería</string>
+    <string name="Camera">Cámara</string>
+    <string name="ModMenu">Menú de moderador</string>
+    <string name="AddMod">Añadir moderador</string>
 </resources>

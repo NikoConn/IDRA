@@ -1,6 +1,7 @@
 package com.nicog.idra.Interface;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -61,18 +63,34 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     public void addPhoto(View v){
-        /*Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        String[] mimeTypes = {"image/jpeg", "image/png"};
-        photoPickerIntent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
-        // Launching the Intent
-        startActivityForResult(photoPickerIntent,2);*/
-        /*if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-        {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, 1888);
-        }
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, 123);*/
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+        pictureDialog.setTitle(getText(R.string.SelectPhoto));
+        String[] pictureDialogItems = { getText(R.string.Gallery).toString(), getText(R.string.Camera).toString()};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallary();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
+    }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(galleryIntent, 2);
+    }
+    private void takePhotoFromCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, 3);
     }
 
     public void addLocation(){
@@ -144,6 +162,10 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
                 e.printStackTrace();
                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
             }
+        }else if(resultCode == RESULT_OK && reqCode == 3) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            selectedImage = photo;
+            addPhotoTextView.setText(getText(R.string.photoAdded));
         }else if(reqCode == 1 && resultCode == RESULT_OK){ //result del mapa
             LatLng latLng = data.getExtras().getParcelable("latLng");
             setLatLng(latLng);

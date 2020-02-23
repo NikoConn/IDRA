@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,8 +42,6 @@ import com.nicog.idra.R;
 import com.nicog.idra.logic.Service;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Document;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,13 +58,19 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     private HashMap<Marker, Fuente> markerFuenteHashMap;
     private List<Fuente> fuenteList;
+    private List<Integer> cuadrantesList;
 
     private Service service;
+
+    private double lastZoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        //set servicio
+        service = new Service();
 
         //set views
         fontListLayout = findViewById(R.id.fontListLinearLayout);
@@ -74,6 +79,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         //set list and map
         markerFuenteHashMap = new HashMap<>();
         fuenteList = new ArrayList<>();
+        cuadrantesList = new ArrayList<>();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -84,22 +90,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         updateLocation(false);
 
-        //if user logs out????????????
-        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() != null){
-                    user = firebaseAuth.getCurrentUser();
-                    //set User image
-                    Picasso.get().load(user.getPhotoUrl()).into(userImageButton);
-                }else{
-                    finish();
-                }
-            }
-        });
-
-        //set servicio
-        service = new Service();
+        Picasso.get().load(service.getUserPhotoUrl()).into(userImageButton);
     }
 
     //OnClick locate button
@@ -138,18 +129,34 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
             Log.i("camera", String.valueOf(position.zoom));
 
-            if (position.zoom < 16.2) {
-                //service.getCuadrante(latLng, addCuadranteToUI);
+            if (position.zoom < 15) {
+                if(lastZoom > 15){
+                    mMap.clear();
+                }
+                service.getCuadrante(latLng, addCuadranteToUI);
             } else {
+                if(lastZoom < 15){
+                    mMap.clear();
+                }
                 service.getFuetnesNearOf(latLng, addFuenteToUI);
             }
+            lastZoom = position.zoom;
         }
     };
 
     OnSuccessListener<DocumentSnapshot> addCuadranteToUI = new OnSuccessListener<DocumentSnapshot>() {
         @Override
         public void onSuccess(DocumentSnapshot documentSnapshot) {
-            mMap.clear();
+            if(!documentSnapshot.exists()){return;}
+            Bitmap aux = BitmapFactory.decodeResource(getResources(), R.drawable.markermap);
+            Bitmap icon = Bitmap.createScaledBitmap(aux, 80,125,false);
+
+            LatLng latLng = service.getCentroCuadrante(Integer.valueOf(documentSnapshot.getId()));
+
+            MarkerOptions mops = new MarkerOptions();
+            mops.position(latLng);
+            mops.icon(BitmapDescriptorFactory.fromBitmap(icon));
+            mMap.addMarker(mops);
         }
     };
 
@@ -166,7 +173,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
 
             addFuenteToMap(fuente);
-
         }
     };
 
@@ -175,15 +181,20 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         @Override
         public boolean onMarkerClick(Marker marker) {
             Fuente fuente = markerFuenteHashMap.get(marker);
-            openFuente(fuente);
-            return false;
+            if(fuente != null){
+                openFuente(fuente);
+            }else{
+                LatLng position = marker.getPosition();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17));
+            }
+            return true;
         }
     };
 
     //Same
     private void openFuente(Fuente fuente){
         Intent i = new Intent(this, VistaFuente.class);
-        i.putExtra("fuente", fuente);
+        i.putExtra("fuenteID", fuente.getId());
 
         LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         int distance = (int) Math.floor(service.getDistance(fuente.getLatLng(), currentLatLng));

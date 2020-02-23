@@ -29,4 +29,9 @@
     <string name="errorTryAgainLater">Error, try again later</string>
     <string name="Done">Done</string>
     <string name="Anonymous">Anonymous</string>
+    <string name="SelectPhoto">Select photo</string>
+    <string name="Gallery">Gallery</string>
+    <string name="Camera">Camera</string>
+    <string name="ModMenu">Mod menu</string>
+    <string name="AddMod">Add mod</string>
 </resources>

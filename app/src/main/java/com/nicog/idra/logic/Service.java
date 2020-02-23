@@ -1,6 +1,7 @@
 package com.nicog.idra.logic;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ public class Service {
     private CollectionReference nicknamesReference;
     private CollectionReference ratingsReference;
     private CollectionReference petitionsReference;
+    private CollectionReference privilegesReference;
     private StorageReference imagenesFuentes;
     private StorageReference peticionesImagenes;
 
@@ -46,6 +48,7 @@ public class Service {
         petitionsReference = db.collection("petitions");
         cuadrantesReference = db.collection("cuadrantes");
         fuentesReference = db.collection("fuentes");
+        privilegesReference = db.collection("privileges");
 
         peticionesImagenes = FirebaseStorage.getInstance().getReference().child("fotos_peticiones");
         imagenesFuentes = FirebaseStorage.getInstance().getReference().child("fotos_fuentes");
@@ -72,7 +75,6 @@ public class Service {
 
     public void getCuadrante(LatLng latLng, OnSuccessListener<DocumentSnapshot> ds){
         int cuadrante = getCuadrante(latLng.latitude, latLng.longitude);
-
         cuadrantesReference.document(String.valueOf(cuadrante)).get().addOnSuccessListener(ds);
     }
 
@@ -101,6 +103,20 @@ public class Service {
     public void getUserNickname(OnSuccessListener<DocumentSnapshot> successListener){
         String uid = user.getUid();
         nicknamesReference.document(uid).get().addOnSuccessListener(successListener);
+    }
+
+    public void changeNickname(String nickname){
+        HashMap<String, String> data = new HashMap<>();
+        data.put("nickname", nickname);
+        nicknamesReference.document(getUserUid()).set(data, SetOptions.merge());
+    }
+
+    public String getUserUid(){
+        return this.user.getUid();
+    }
+
+    public Uri getUserPhotoUrl(){
+        return user.getPhotoUrl();
     }
 
     public void getNickname(String uid, OnSuccessListener<DocumentSnapshot> successListener){
@@ -163,6 +179,16 @@ public class Service {
         }
     }
 
+    public void getUserPrivileges(OnSuccessListener<DocumentSnapshot> onSuccessListener){
+        privilegesReference.document(getUserUid()).get().addOnSuccessListener(onSuccessListener);
+    }
+
+    public void addMod(String uid){
+        HashMap<String, Boolean> aux = new HashMap<>();
+        aux.put("mod", true);
+        privilegesReference.document(uid).set(aux, SetOptions.merge());
+    }
+
     public double getDistance(LatLng latLng1, LatLng latLng2){
         double lat1 = latLng1.latitude;
         double lon1 = latLng1.longitude;
@@ -188,10 +214,24 @@ public class Service {
     private int getCuadrante(double lat, double lon) {
         double lCuadrantes = 0.01;
         int nFilas = (int) (180 / lCuadrantes);
+        int nFilasMitad = nFilas/2;
 
-        int nLatitud = (int) Math.floor(lat / lCuadrantes);
-        int nLongitud = (int) (Math.floor(lon / lCuadrantes) * nFilas);
+        int nLatitud = ((int) Math.floor( (lat/lCuadrantes) + nFilasMitad)) * nFilas;
+        int nLongitud = (int) Math.floor( (lon/lCuadrantes) + nFilasMitad);
 
-        return (int) Math.floor(nLatitud + nLongitud) + 162009000;
+        int cuadrante = nLatitud + nLongitud;
+        return cuadrante;
+    }
+
+    public LatLng getCentroCuadrante(int cuadrante){
+        double lCuadrantes = 0.01;
+        int nFilas = (int) (180 / lCuadrantes);
+        int nFilasMitad = nFilas/2;
+
+        double latitud = (cuadrante/nFilas) - nFilasMitad;
+        double longitud = (cuadrante%nFilas) - nFilasMitad;
+
+        LatLng latLng = new LatLng(latitud*lCuadrantes + 0.005, longitud*lCuadrantes + 0.005);
+        return latLng;
     }
 }

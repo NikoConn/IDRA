@@ -24,8 +24,6 @@ import com.nicog.idra.Entities.Fuente;
 import com.nicog.idra.R;
 import com.nicog.idra.logic.Service;
 
-import org.w3c.dom.Document;
-
 import java.util.Map;
 
 public class VistaFuente extends AppCompatActivity {
@@ -34,42 +32,48 @@ public class VistaFuente extends AppCompatActivity {
     private TextView metersTextView;
     private TextView createdBy;
     private TextView descripcionTextView;
+    private TextView mTextView;
     private ImageView[] starsImages;
 
     private Fuente fuente;
     public Service service;
 
+    GoogleMap gMap;
+
     InterstitialAd mInterstitialAd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vista_fuente);
 
-        fuente = (Fuente) getIntent().getSerializableExtra("fuente");
-        int metros = getIntent().getIntExtra("metros", 0);
-
         service = new Service();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapFuente);
+        String fuenteId = getIntent().getStringExtra("fuenteID");
+        final Integer distancia = getIntent().getIntExtra("metros", -1);
+
+        service.getFuente(fuenteId, new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Fuente f = Fuente.fromDocumentSnapshot(documentSnapshot);
+                fuente = f;
+                updateUI(f, distancia);
+            }
+        });
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFuente);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(fuente.getLatLng(), 15));
-
-                Bitmap aux = BitmapFactory.decodeResource(getResources(), R.drawable.markermap);
-                Bitmap icon = Bitmap.createScaledBitmap(aux, 80,125,false);
-
-                MarkerOptions mops = new MarkerOptions();
-                mops.position(fuente.getLatLng());
-                mops.icon(BitmapDescriptorFactory.fromBitmap(icon));
-                googleMap.addMarker(mops);
+                gMap = googleMap;
 
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
                 googleMap.getUiSettings().setMyLocationButtonEnabled(false);
             }
         });
+
+        findViewById(R.id.mapFuente).setMinimumHeight(150);
 
         starsImages = new ImageView[]{findViewById(R.id.star1), findViewById(R.id.star2), findViewById(R.id.star3),
                                         findViewById(R.id.star4), findViewById(R.id.star5)};
@@ -78,8 +82,7 @@ public class VistaFuente extends AppCompatActivity {
         metersTextView = findViewById(R.id.metersTextView);
         createdBy = findViewById(R.id.createdByTextView);
         descripcionTextView = findViewById(R.id.descripcionTextView);
-
-        updateUI(fuente, metros);
+        mTextView = findViewById(R.id.mVistaFuenteTextView);
 
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-5821282725257897/7378140761");
@@ -87,9 +90,14 @@ public class VistaFuente extends AppCompatActivity {
 
     }
 
-    private void updateUI(Fuente fuente, int metros){
+    private void updateUI(Fuente fuente, Integer distancia){
         tituloFuente.setText(fuente.getTitulo());
-        metersTextView.setText(String.valueOf(metros));
+
+        if(distancia < 0){
+            mTextView.setVisibility(View.INVISIBLE);
+        }else{
+            metersTextView.setText(String.valueOf(distancia));
+        }
 
         if(fuente.getCreador() == null || fuente.getCreador().equals("")){
             createdBy.setText(getText(R.string.Anonymous));
@@ -124,11 +132,7 @@ public class VistaFuente extends AppCompatActivity {
                     media += (long) entry.getValue();
                 }
 
-                Log.i("rating", String.valueOf(media));
-
                 media /= (double) ratings.size();
-
-                Log.i("rating", String.valueOf(media));
 
                 setRatingUI(media);
             }
@@ -140,6 +144,19 @@ public class VistaFuente extends AppCompatActivity {
         }
 
         setStarsImages();
+        setMap();
+    }
+
+    private void setMap(){
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(fuente.getLatLng(), 15));
+
+        Bitmap aux = BitmapFactory.decodeResource(getResources(), R.drawable.markermap);
+        Bitmap icon = Bitmap.createScaledBitmap(aux, 80,125,false);
+
+        MarkerOptions mops = new MarkerOptions();
+        mops.position(fuente.getLatLng());
+        mops.icon(BitmapDescriptorFactory.fromBitmap(icon));
+        gMap.addMarker(mops);
     }
 
     private void setRatingUI(double rating){
