@@ -1,12 +1,18 @@
 package com.nicog.idra.Interface;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.app.UiModeManager;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,7 +40,7 @@ public class VistaFuente extends AppCompatActivity {
     private TextView createdBy;
     private TextView descripcionTextView;
     private TextView mTextView;
-    private ImageView[] starsImages;
+    private Button[] starsImages;
 
     private Fuente fuente;
     public Service service;
@@ -49,17 +56,12 @@ public class VistaFuente extends AppCompatActivity {
 
         service = new Service();
 
+        if(!service.userIsLogged()){
+            returnToLogin();
+        }
+
         String fuenteId = getIntent().getStringExtra("fuenteID");
         final Integer distancia = getIntent().getIntExtra("metros", -1);
-
-        service.getFuente(fuenteId, new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Fuente f = Fuente.fromDocumentSnapshot(documentSnapshot);
-                fuente = f;
-                updateUI(f, distancia);
-            }
-        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFuente);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -75,8 +77,8 @@ public class VistaFuente extends AppCompatActivity {
 
         findViewById(R.id.mapFuente).setMinimumHeight(150);
 
-        starsImages = new ImageView[]{findViewById(R.id.star1), findViewById(R.id.star2), findViewById(R.id.star3),
-                                        findViewById(R.id.star4), findViewById(R.id.star5)};
+        starsImages = new Button[]{findViewById(R.id.star1), findViewById(R.id.star2), findViewById(R.id.star3),
+                findViewById(R.id.star4), findViewById(R.id.star5)};
         tituloFuente = findViewById(R.id.tituloFuente);
         imageFuente = findViewById(R.id.imageFuente);
         metersTextView = findViewById(R.id.metersTextView);
@@ -88,6 +90,21 @@ public class VistaFuente extends AppCompatActivity {
         mInterstitialAd.setAdUnitId("ca-app-pub-5821282725257897/7378140761");
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        Uri appLinkData = appLinkIntent.getData();
+
+        if(appLinkData != null){
+            fuenteId = appLinkData.getLastPathSegment();
+        }
+
+        service.getFuente(fuenteId, new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                fuente = Fuente.fromDocumentSnapshot(documentSnapshot);
+                updateUI(fuente, distancia);
+            }
+        });
     }
 
     private void updateUI(Fuente fuente, Integer distancia){
@@ -161,8 +178,8 @@ public class VistaFuente extends AppCompatActivity {
 
     private void setRatingUI(double rating){
         for(int i = 0; i < rating && i <= 5; i++){
-            if(rating >= i + 1){ starsImages[i].setImageResource(R.drawable.full_star); }
-            else if(rating >= i + 0.5){ starsImages[i].setImageResource(R.drawable.half_star); }
+            if(rating >= i + 1){ starsImages[i].setBackgroundResource(R.drawable.full_star); }
+            else if(rating >= i + 0.5){ starsImages[i].setBackgroundResource(R.drawable.half_star); }
         }
     }
 
@@ -175,16 +192,42 @@ public class VistaFuente extends AppCompatActivity {
                     service.addRating(fuente, x);
                     for(int y = 0; y < starsImages.length; y++){
                         if(x >= y+1){
-                            starsImages[y].setColorFilter(getColor(R.color.blue5));
-                            starsImages[y].setImageResource(R.drawable.full_star);
+                            starsImages[y].setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.blue5));
+                            starsImages[y].setBackgroundResource(R.drawable.full_star);
                         }else{
-                            starsImages[y].setColorFilter(null);
-                            starsImages[y].setImageResource(R.drawable.empty_star);
+                            int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                            Log.i("data", "y:" + y + ", night:" + currentNightMode);
+                            if(currentNightMode == Configuration.UI_MODE_NIGHT_NO){
+                                starsImages[y].setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.dark));
+                            }else if(currentNightMode == Configuration.UI_MODE_NIGHT_YES){
+                                starsImages[y].setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.white));
+
+                            }
+                            starsImages[y].setBackgroundResource(R.drawable.empty_star);
                         }
                     }
                 }
             });
         }
+    }
+
+    private void returnToLogin(){
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+        finish();
+    }
+
+    public void share(View v){
+        String id = fuente.getId();
+        String url = "fuente.idrapp.es/" + id;
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, url);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        startActivity(shareIntent);
     }
 
     @Override

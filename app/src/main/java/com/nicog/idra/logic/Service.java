@@ -56,6 +56,10 @@ public class Service {
         user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    public boolean userIsLogged(){
+        return user != null;
+    }
+
 
     public void getFuetnesNearOf(LatLng latLng, final OnSuccessListener<DocumentSnapshot> callback){
         int cuadrante = getCuadrante(latLng.latitude, latLng.longitude);

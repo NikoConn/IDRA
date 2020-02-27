@@ -66,6 +66,7 @@
         android:selectAllOnFocus="true"
         android:text="Nickname"
         android:textAlignment="center"
+        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView" />
@@ -87,6 +88,7 @@
         android:background="@drawable/btn_round"
         android:padding="10dp"
         android:text="@string/ModMenu"
+        android:textColor="@android:color/black"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/button2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -101,6 +103,7 @@
         android:onClick="addAdmin"
         android:padding="10dp"
         android:text="@string/AddMod"
+        android:textColor="@android:color/black"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/modMenuButton"
         app:layout_constraintEnd_toEndOf="parent"

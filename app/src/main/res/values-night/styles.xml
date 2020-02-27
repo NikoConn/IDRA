@@ -14,8 +14,9 @@
     </style>
 
     <style name="box">
-        <item name="android:backgroundTint">@color/grayBox</item>
+        <item name="android:backgroundTint">@color/darkBox</item>
     </style>
+
 
 
 </resources>
