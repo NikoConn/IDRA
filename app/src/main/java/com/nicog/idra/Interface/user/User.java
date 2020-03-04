@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.nicog.idra.Interface.mod.ModMenu;
 import com.nicog.idra.R;
 import com.nicog.idra.logic.Service;
 import com.squareup.picasso.Picasso;
@@ -89,6 +90,8 @@ public class User extends AppCompatActivity {
                 if(!documentSnapshot.exists()){return;}
                 Boolean isAdmin = documentSnapshot.getBoolean("admin");
                 Boolean isMod = documentSnapshot.getBoolean("mod");
+                Boolean algo = documentSnapshot.getBoolean("algo");
+                Log.i("data", "isAdmin:" + isAdmin + ", isMod:" + isMod + ", algo:" + algo);
                 if(isAdmin == null){ isAdmin = false; }
                 if(isMod == null){ isMod = false; }
                 isMod = isMod || isAdmin;
@@ -164,6 +167,11 @@ public class User extends AppCompatActivity {
 
     public void addAdmin(View v){
         openQrCamera();
+    }
+
+    public void openModMenu(View v){
+        Intent i = new Intent(this, ModMenu.class);
+        startActivity(i);
     }
 
     @Override

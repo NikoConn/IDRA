@@ -1,9 +1,8 @@
-package com.nicog.idra.Interface;
+package com.nicog.idra.Interface.VistaFuente;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.UiModeManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -23,15 +22,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.nicog.idra.Entities.Fuente;
+import com.nicog.idra.Entities.Incident;
+import com.nicog.idra.Interface.MainActivity;
 import com.nicog.idra.R;
 import com.nicog.idra.logic.Service;
-
-import java.util.Map;
 
 public class VistaFuente extends AppCompatActivity {
     private TextView tituloFuente;
@@ -43,11 +41,15 @@ public class VistaFuente extends AppCompatActivity {
     private Button[] starsImages;
 
     private Fuente fuente;
+    private int distancia;
     public Service service;
 
     GoogleMap gMap;
 
     InterstitialAd mInterstitialAd;
+
+    private boolean fuenteTerminado = false;
+    private boolean mapTerminado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +62,8 @@ public class VistaFuente extends AppCompatActivity {
             returnToLogin();
         }
 
-        String fuenteId = getIntent().getStringExtra("fuenteID");
-        final Integer distancia = getIntent().getIntExtra("metros", -1);
+        fuente = (Fuente) getIntent().getExtras().getSerializable("fuente");
+        distancia = getIntent().getIntExtra("metros", -1);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFuente);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -72,6 +74,8 @@ public class VistaFuente extends AppCompatActivity {
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
                 googleMap.getUiSettings().setMapToolbarEnabled(false);
                 googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                mapTerminado = true;
+                updateUI();
             }
         });
 
@@ -94,20 +98,24 @@ public class VistaFuente extends AppCompatActivity {
         Intent appLinkIntent = getIntent();
         Uri appLinkData = appLinkIntent.getData();
 
-        if(appLinkData != null){
-            fuenteId = appLinkData.getLastPathSegment();
+        if(appLinkData != null){                            //si el usuario viene del link
+            String fuenteId = appLinkData.getLastPathSegment();
+            service.getFuente(fuenteId, new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    fuente = Fuente.fromDocumentSnapshot(documentSnapshot);
+                    fuenteTerminado = true;
+                    updateUI();
+                }
+            });
+        }else if(fuente != null){
+            fuenteTerminado = true;
+            updateUI();
         }
-
-        service.getFuente(fuenteId, new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                fuente = Fuente.fromDocumentSnapshot(documentSnapshot);
-                updateUI(fuente, distancia);
-            }
-        });
     }
 
-    private void updateUI(Fuente fuente, Integer distancia){
+    private void updateUI(){
+        if(!fuenteTerminado || !mapTerminado) return;
         tituloFuente.setText(fuente.getTitulo());
 
         if(distancia < 0){
@@ -129,6 +137,12 @@ public class VistaFuente extends AppCompatActivity {
 
         if(fuente.getFoto() == null || fuente.getFoto().equals("")){
             imageFuente.setImageResource(R.drawable.ejemplofuente);
+            imageFuente.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    reportarIncidencia(Incident.fotografia);
+                }
+            });
         }else{
             service.getFotoFuente(fuente, new OnSuccessListener<byte[]>() {
                 @Override
@@ -142,22 +156,21 @@ public class VistaFuente extends AppCompatActivity {
         service.getRatings(fuente, new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Map<String, Object> ratings = documentSnapshot.getData();
-                double media = 0;
-                if(ratings == null){return;}
-                for(Map.Entry<String, Object> entry : ratings.entrySet()){
-                    media += (long) entry.getValue();
-                }
-
-                media /= (double) ratings.size();
-
-                setRatingUI(media);
+                Double avg = documentSnapshot.getDouble("avg");
+                if(avg != null) setRatingUI(avg);
             }
         });
 
         String descr = fuente.getDescripcion();
         if(descr != null && !descr.equals("")){
             descripcionTextView.setText(descr);
+        }else{
+            descripcionTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    reportarIncidencia(Incident.descripcion);
+                }
+            });
         }
 
         setStarsImages();
@@ -228,6 +241,17 @@ public class VistaFuente extends AppCompatActivity {
 
         Intent shareIntent = Intent.createChooser(sendIntent, null);
         startActivity(shareIntent);
+    }
+
+    public void reportarIncidenciaClick(View v){
+        reportarIncidencia(-1);
+    }
+
+    private void reportarIncidencia(int type){
+        Intent i = new Intent(this, ReportIncident.class);
+        if(type >= 0) i.putExtra("type", type);
+        i.putExtra("fuente", fuente);
+        startActivity(i);
     }
 
     @Override

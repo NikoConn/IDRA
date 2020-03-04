@@ -1,6 +1,5 @@
 package com.nicog.idra.Interface;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,10 +31,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.nicog.idra.Entities.Fuente;
+import com.nicog.idra.Interface.VistaFuente.VistaFuente;
+import com.nicog.idra.Interface.addFuente.addFuente;
 import com.nicog.idra.Interface.user.User;
 import com.nicog.idra.R;
 import com.nicog.idra.logic.Service;
@@ -58,7 +57,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     private HashMap<Marker, Fuente> markerFuenteHashMap;
     private List<Fuente> fuenteList;
-    private List<Integer> cuadrantesList;
+    //private List<Integer> cuadrantesList;
 
     private Service service;
 
@@ -79,7 +78,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
         //set list and map
         markerFuenteHashMap = new HashMap<>();
         fuenteList = new ArrayList<>();
-        cuadrantesList = new ArrayList<>();
+        //cuadrantesList = new ArrayList<>();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -194,7 +193,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     //Same
     private void openFuente(Fuente fuente){
         Intent i = new Intent(this, VistaFuente.class);
-        i.putExtra("fuenteID", fuente.getId());
+        i.putExtra("fuente", fuente);
 
         LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         int distance = (int) Math.floor(service.getDistance(fuente.getLatLng(), currentLatLng));

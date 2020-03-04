@@ -52,6 +52,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/btn_round"
+                android:backgroundTint="@color/white"
                 android:gravity="center"
                 android:onClick="addFuente"
                 android:scaleType="centerCrop"

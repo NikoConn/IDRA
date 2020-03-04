@@ -1,4 +1,4 @@
-package com.nicog.idra.Interface;
+package com.nicog.idra.Interface.addFuente;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -17,6 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -89,8 +91,13 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
         startActivityForResult(galleryIntent, 2);
     }
     private void takePhotoFromCamera() {
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, 3);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 756);
+
+        }else{
+            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, 3);
+        }
     }
 
     public void addLocation(){
@@ -116,7 +123,7 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
             service.addPetition(fuente, selectedImage, new OnSuccessListener() {
                 @Override
                 public void onSuccess(Object o) {
-                    Toast.makeText(addFuente.this, getText(R.string.Done), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(addFuente.this, getText(R.string.thanksPetition), Toast.LENGTH_LONG).show();
                     addFuente.this.finish();
                 }
             }, new OnFailureListener() {
@@ -169,6 +176,8 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
         }else if(reqCode == 1 && resultCode == RESULT_OK){ //result del mapa
             LatLng latLng = data.getExtras().getParcelable("latLng");
             setLatLng(latLng);
+        }else if(resultCode == RESULT_OK && reqCode == 756){  //result de permisos de camara
+            takePhotoFromCamera();
         }
     }
 }

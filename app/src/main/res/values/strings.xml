@@ -34,4 +34,16 @@
     <string name="Camera">Camera</string>
     <string name="ModMenu">Mod menu</string>
     <string name="AddMod">Add mod</string>
+    <string name="TypeOfProblem">Type of problem</string>
+    <string name="incorrectPhoto">Incorrect/non-existent photography</string>
+    <string name="incorrectDescription">Incorrect/non-existent description</string>
+    <string name="NonExistentSource">Non-existent water source</string>
+    <string name="Other">Other</string>
+    <string name="ProblemDescription">Problem description</string>
+    <string name="Send">Send</string>
+    <string name="thanksIncident">Thank you. Your incident will be revised by moderators.</string>
+    <string name="fillFields">Please, fill all fields</string>
+    <string name="addWaterSource">Add water source</string>
+    <string name="Incidents">Incidents</string>
+    <string name="thanksPetition">Thank you. Your petition will be revised by moderators.</string>
 </resources>

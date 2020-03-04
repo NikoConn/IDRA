@@ -2,7 +2,6 @@ package com.nicog.idra.logic;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -17,11 +16,13 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nicog.idra.Entities.Fuente;
+import com.nicog.idra.Entities.Incident;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -34,9 +35,11 @@ public class Service {
     private CollectionReference nicknamesReference;
     private CollectionReference ratingsReference;
     private CollectionReference petitionsReference;
+    private CollectionReference incidentReference;
     private CollectionReference privilegesReference;
     private StorageReference imagenesFuentes;
     private StorageReference peticionesImagenes;
+    private StorageReference incidentesImagenes;
 
     private FirebaseUser user;
 
@@ -49,9 +52,12 @@ public class Service {
         cuadrantesReference = db.collection("cuadrantes");
         fuentesReference = db.collection("fuentes");
         privilegesReference = db.collection("privileges");
+        incidentReference = db.collection("incidents");
 
         peticionesImagenes = FirebaseStorage.getInstance().getReference().child("fotos_peticiones");
         imagenesFuentes = FirebaseStorage.getInstance().getReference().child("fotos_fuentes");
+        incidentesImagenes = FirebaseStorage.getInstance().getReference().child("fotos_incidentes");
+
 
         user = FirebaseAuth.getInstance().getCurrentUser();
     }
@@ -59,7 +65,6 @@ public class Service {
     public boolean userIsLogged(){
         return user != null;
     }
-
 
     public void getFuetnesNearOf(LatLng latLng, final OnSuccessListener<DocumentSnapshot> callback){
         int cuadrante = getCuadrante(latLng.latitude, latLng.longitude);
@@ -149,27 +154,29 @@ public class Service {
                     aux.put("foto", id);
                     petitionsReference.document(id).update(aux);
 
-                    uploadFoto(id, bitmap, successListener, failureListener);
+                    uploadFoto(id, bitmap, peticionesImagenes, successListener, failureListener);
                 }
             }).addOnFailureListener(failureListener);
         }
     }
 
-    private void uploadFoto(String id, Bitmap bitmap, OnSuccessListener successListener, OnFailureListener failureListener){
+    private void uploadFoto(String id, Bitmap bitmap, StorageReference reference,OnSuccessListener successListener, OnFailureListener failureListener){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos);
         final byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = peticionesImagenes.child(id).putBytes(data);
+        UploadTask uploadTask = reference.child(id).putBytes(data);
 
         uploadTask.addOnSuccessListener(successListener).addOnFailureListener(failureListener);
     }
 
     public void addRating(Fuente fuente, int rating){
-        String uid = user.getUid();
+        String uid = getUserUid();
+        CollectionReference userRatingReference = ratingsReference.document(fuente.getId()).collection("user-ratings");
+
         HashMap<String, Long> data = new HashMap<>();
-        data.put(uid, (long) rating);
-        ratingsReference.document(fuente.getId()).set(data, SetOptions.merge());
+        data.put("rating", (long) rating);
+        userRatingReference.document(uid).set(data);
     }
 
     public void getRatings(Fuente fuente, OnSuccessListener<DocumentSnapshot> ds){
@@ -191,6 +198,35 @@ public class Service {
         HashMap<String, Boolean> aux = new HashMap<>();
         aux.put("mod", true);
         privilegesReference.document(uid).set(aux, SetOptions.merge());
+    }
+
+    public void addIncident(Incident incident, OnSuccessListener successListener, OnFailureListener failureListener){
+        incidentReference.add(incident).addOnSuccessListener(successListener).addOnFailureListener(failureListener);
+    }
+
+    public void addIncidentPhoto(final Bitmap photo, String fuenteId, final OnSuccessListener successListener, final OnFailureListener failureListener){
+        final Incident i = new Incident();
+        i.setUserUid(getUserUid());
+        i.setFuenteId(fuenteId);
+
+        addIncident(i, new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                final String incidentId = documentReference.getId();
+                uploadFoto(incidentId, photo, incidentesImagenes, new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        i.setDescription(incidentId);
+                        incidentReference.document(incidentId).set(i).addOnSuccessListener(successListener).addOnFailureListener(failureListener);
+                    }
+                }, failureListener);
+            }
+        }, failureListener);
+
+    }
+
+    public void getPetitions(OnSuccessListener<QuerySnapshot> successListener){
+        petitionsReference.limit(10).get().addOnSuccessListener(successListener);
     }
 
     public double getDistance(LatLng latLng1, LatLng latLng2){

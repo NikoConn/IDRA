@@ -12,10 +12,4 @@
     <style name="DefaultFont" parent="@android:style/TextAppearance.Medium">
         <item name="android:fontFamily">@font/raleway</item>
     </style>
-
-    <style name="box">
-        <item name="android:backgroundTint">@color/grayBox</item>
-    </style>
-
-
 </resources>

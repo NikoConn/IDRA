@@ -33,4 +33,16 @@
     <string name="Camera">Cámara</string>
     <string name="ModMenu">Menú de moderador</string>
     <string name="AddMod">Añadir moderador</string>
+    <string name="TypeOfProblem">Tipo de problema</string>
+    <string name="incorrectPhoto">Fotografia incorrecta/inexistente</string>
+    <string name="incorrectDescription">Descripción incorrecta/inexistente</string>
+    <string name="NonExistentSource">Fuente inexistente</string>
+    <string name="Other">Otro</string>
+    <string name="ProblemDescription">Descripción del problema</string>
+    <string name="Send">Enviar</string>
+    <string name="thanksIncident">Gracias, La incidencia será revisada por los moderadores.</string>
+    <string name="fillFields">Por favor, rellena todos los campos.</string>
+    <string name="addWaterSource">Añadir fuente</string>
+    <string name="Incidents">Incidencias</string>
+    <string name="thanksPetition">Gracias, La petición será revisada por los moderadores.</string>
 </resources>

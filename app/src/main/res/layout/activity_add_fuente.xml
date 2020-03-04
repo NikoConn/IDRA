@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".Interface.addFuente">
+    tools:context=".Interface.addFuente.addFuente">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,10 +57,10 @@
 
             <EditText
                 android:id="@+id/nameEditText"
-                style="@style/box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/txt_round"
+                android:backgroundTint="@color/boxColor"
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:padding="10dp" />
@@ -82,10 +82,10 @@
 
             <EditText
                 android:id="@+id/descriptionEditText"
-                style="@style/box"
                 android:layout_width="match_parent"
                 android:layout_height="125dp"
                 android:background="@drawable/txt_round"
+                android:backgroundTint="@color/boxColor"
                 android:ems="10"
                 android:gravity="start|top"
                 android:inputType="textMultiLine"

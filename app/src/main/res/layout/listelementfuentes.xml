@@ -10,7 +10,8 @@
         android:id="@+id/layoutElement"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:background="@drawable/card_background">
+        android:background="@drawable/card_background"
+        android:backgroundTint="@color/boxColor">
 
 
         <TextView
@@ -22,7 +23,6 @@
             android:fontFamily="@font/raleway_bold"
             android:gravity="center"
             android:text="Alguna fuente de algun lugar"
-            android:textColor="#000000"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/cardViewElement"
@@ -62,7 +62,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="m"
-                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <Space
@@ -77,7 +76,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="m"
-                android:textColor="#000000"
                 android:textStyle="bold" />
         </LinearLayout>
 
