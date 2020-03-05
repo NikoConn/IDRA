@@ -254,7 +254,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
                     Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     imagenFuente.setImageBitmap(bmp);
                 }
-            });
+            }, service.imagenesFuentes);
         } else {
             constraintLayout.removeView(card);
 

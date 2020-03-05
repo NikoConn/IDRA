@@ -1,6 +1,7 @@
 package com.nicog.idra.logic;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -37,9 +38,9 @@ public class Service {
     private CollectionReference petitionsReference;
     private CollectionReference incidentReference;
     private CollectionReference privilegesReference;
-    private StorageReference imagenesFuentes;
-    private StorageReference peticionesImagenes;
-    private StorageReference incidentesImagenes;
+    public StorageReference imagenesFuentes;
+    public StorageReference peticionesImagenes;
+    public StorageReference incidentesImagenes;
 
     private FirebaseUser user;
 
@@ -91,23 +92,55 @@ public class Service {
         fuentesReference.document(id).get().addOnSuccessListener(callback);
     }
 
-    /*public void addFuenteToDB(final Fuente fuente) {
+    private void addFuenteToDB(final Fuente fuente, final OnSuccessListener successListener, final OnFailureListener failureListener) {
         double lat = fuente.getLatLng().latitude;
         double lon = fuente.getLatLng().longitude;
         final int cuadrante = getCuadrante(lat, lon);
 
-        Log.i("Cuadrante", String.valueOf(cuadrante));
-        fuentesReference.add(fuente).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        fuentesReference.add(fuente).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                DocumentReference dr = task.getResult();
-
+            public void onSuccess(final DocumentReference dr) {
                 HashMap<String, Object> aux = new HashMap<>();
                 aux.put(dr.getId(), dr);
-                cuadrantesReference.document(String.valueOf(cuadrante)).set(aux, SetOptions.merge());
+                cuadrantesReference.document(String.valueOf(cuadrante)).set(aux, SetOptions.merge())
+                        .addOnSuccessListener(successListener)
+                        .addOnFailureListener(failureListener);
+
+                if(fuente.getFoto() != null && !fuente.getFoto().equals("")) {
+
+                    final StorageReference ref = peticionesImagenes.child(fuente.getFoto());
+
+                    getFotoFuente(fuente, new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            uploadFoto(dr.getId(), bitmap, imagenesFuentes.child(dr.getId()), null, null);
+                            ref.delete();
+                        }
+                    }, ref);
+                }
+
             }
-        });
-    }*/
+        }).addOnFailureListener(failureListener);
+    }
+
+    private void removePetition(String petitionId, OnSuccessListener successListener, OnFailureListener failureListener){
+        petitionsReference.document(petitionId).delete().addOnSuccessListener(successListener).addOnFailureListener(failureListener);
+
+    }
+
+    public void acceptPetition(final Fuente fuente, OnSuccessListener successListener, OnFailureListener failureListener){
+        addFuenteToDB(fuente, successListener, failureListener);
+        removePetition(fuente.getId(), successListener, failureListener);
+
+    }
+
+    public void denyPetition(Fuente fuente, OnSuccessListener successListener, OnFailureListener failureListener){
+        if(fuente.getFoto() != null && !fuente.getFoto().equals("")){
+            peticionesImagenes.child(fuente.getFoto()).delete();
+        }
+        removePetition(fuente.getId(), successListener, failureListener);
+    }
 
     public void getUserNickname(OnSuccessListener<DocumentSnapshot> successListener){
         String uid = user.getUid();
@@ -183,9 +216,8 @@ public class Service {
         ratingsReference.document(fuente.getId()).get().addOnSuccessListener(ds);
     }
 
-    public void getFotoFuente(Fuente fuente, OnSuccessListener<byte[]> successListener){
+    public void getFotoFuente(Fuente fuente, OnSuccessListener<byte[]> successListener, StorageReference reference){
         if(fuente.getFoto() != null && !fuente.getFoto().equals("")){
-            StorageReference reference = imagenesFuentes.child(fuente.getFoto());
             reference.getBytes(1024*1024).addOnSuccessListener(successListener);
         }
     }

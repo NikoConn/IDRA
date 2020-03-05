@@ -1,6 +1,6 @@
 package com.nicog.idra.Entities;
 
-public class Incident {
+public class Incident implements java.io.Serializable{
     public static int fotografia = 0;
     public static int descripcion = 1;
     public static int inexistente = 2;

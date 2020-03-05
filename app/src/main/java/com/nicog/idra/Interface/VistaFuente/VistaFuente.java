@@ -1,5 +1,6 @@
 package com.nicog.idra.Interface.VistaFuente;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -23,8 +25,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.storage.StorageReference;
 import com.nicog.idra.Entities.Fuente;
 import com.nicog.idra.Entities.Incident;
 import com.nicog.idra.Interface.MainActivity;
@@ -39,6 +43,9 @@ public class VistaFuente extends AppCompatActivity {
     private TextView descripcionTextView;
     private TextView mTextView;
     private Button[] starsImages;
+    private Button accpetPetitionButton;
+    private Button denyPetitionButton;
+    private Button reportIncidentButton;
 
     private Fuente fuente;
     private int distancia;
@@ -50,6 +57,11 @@ public class VistaFuente extends AppCompatActivity {
 
     private boolean fuenteTerminado = false;
     private boolean mapTerminado = false;
+
+    public static int vistaFuente = 1;
+    public static int vistaAddFuente = 2;
+
+    private int mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +76,7 @@ public class VistaFuente extends AppCompatActivity {
 
         fuente = (Fuente) getIntent().getExtras().getSerializable("fuente");
         distancia = getIntent().getIntExtra("metros", -1);
+        mode = getIntent().getIntExtra("mode", vistaFuente);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFuente);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -89,6 +102,9 @@ public class VistaFuente extends AppCompatActivity {
         createdBy = findViewById(R.id.createdByTextView);
         descripcionTextView = findViewById(R.id.descripcionTextView);
         mTextView = findViewById(R.id.mVistaFuenteTextView);
+        denyPetitionButton = findViewById(R.id.denyPetitionButton);
+        accpetPetitionButton = findViewById(R.id.acceptPetitionButton);
+        reportIncidentButton = findViewById(R.id.reportIncidentButton);
 
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-5821282725257897/7378140761");
@@ -144,13 +160,20 @@ public class VistaFuente extends AppCompatActivity {
                 }
             });
         }else{
+            StorageReference reference = null;
+            if(mode == vistaFuente){
+                reference = service.imagenesFuentes;
+            }else if(mode == vistaAddFuente){
+                reference = service.peticionesImagenes;
+            }
+
             service.getFotoFuente(fuente, new OnSuccessListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] bytes) {
                     Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     imageFuente.setImageBitmap(bmp);
                 }
-            });
+            }, reference.child(fuente.getFoto()));
         }
 
         service.getRatings(fuente, new OnSuccessListener<DocumentSnapshot>() {
@@ -173,8 +196,21 @@ public class VistaFuente extends AppCompatActivity {
             });
         }
 
+        setButtons();
         setStarsImages();
         setMap();
+    }
+
+    private void setButtons(){
+        switch(mode){
+            case 1:
+                reportIncidentButton.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                denyPetitionButton.setVisibility(View.VISIBLE);
+                accpetPetitionButton.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     private void setMap(){
@@ -197,6 +233,7 @@ public class VistaFuente extends AppCompatActivity {
     }
 
     private void setStarsImages(){
+        if(mode != vistaFuente){return;}
         for(int i = 1; i <= starsImages.length; i++){
             final int x = i;
             starsImages[i-1].setOnClickListener(new View.OnClickListener() {
@@ -231,6 +268,7 @@ public class VistaFuente extends AppCompatActivity {
     }
 
     public void share(View v){
+        if(mode != vistaFuente){return;}
         String id = fuente.getId();
         String url = "fuente.idrapp.es/" + id;
 
@@ -252,6 +290,28 @@ public class VistaFuente extends AppCompatActivity {
         if(type >= 0) i.putExtra("type", type);
         i.putExtra("fuente", fuente);
         startActivity(i);
+    }
+
+    private OnSuccessListener successListener = new OnSuccessListener() {
+        @Override
+        public void onSuccess(Object o) {
+            finish();
+        }
+    };
+
+    private OnFailureListener failureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            Toast.makeText(VistaFuente.this, R.string.errorTryAgainLater, Toast.LENGTH_LONG).show();
+        }
+    };
+
+    public void acceptPetition(View v){
+        service.acceptPetition(fuente, successListener, failureListener);
+    }
+
+    public void denyPetition(View v){
+        service.denyPetition(fuente, successListener, failureListener);
     }
 
     @Override

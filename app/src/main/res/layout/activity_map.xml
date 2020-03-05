@@ -70,18 +70,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bottom_sheet"
+        android:backgroundTint="?attr/colorBackgroundFloating"
         android:orientation="vertical"
-        app:layout_behavior="@string/bottom_sheet_behavior"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="60dp">
+        app:behavior_peekHeight="60dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
 
 
         <LinearLayout
             android:id="@+id/fontListLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bottom_sheet"
-            android:backgroundTint="?attr/colorBackgroundFloating"
             android:gravity="right"
             android:orientation="vertical"
             android:paddingStart="10dp"

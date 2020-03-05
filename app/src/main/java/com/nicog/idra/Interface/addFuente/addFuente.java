@@ -1,6 +1,7 @@
 package com.nicog.idra.Interface.addFuente;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,7 +46,8 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
     private ImageView marker;
 
     private LatLng latLng;
-    Bitmap selectedImage;
+    private Bitmap selectedImage;
+    private Uri imageUri;
 
     private Service service;
 
@@ -93,9 +96,15 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
     private void takePhotoFromCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 756);
-
+        }else if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 756);
         }else{
-            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "New Picture");
+            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+            imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(intent, 3);
         }
     }
@@ -170,9 +179,11 @@ public class addFuente extends AppCompatActivity implements OnMapReadyCallback {
                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
             }
         }else if(resultCode == RESULT_OK && reqCode == 3) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            selectedImage = photo;
-            addPhotoTextView.setText(getText(R.string.photoAdded));
+            try {
+                selectedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else if(reqCode == 1 && resultCode == RESULT_OK){ //result del mapa
             LatLng latLng = data.getExtras().getParcelable("latLng");
             setLatLng(latLng);

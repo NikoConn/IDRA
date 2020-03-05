@@ -42,7 +42,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="20dp"
             app:cardCornerRadius="20dp">
@@ -58,6 +58,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
 
@@ -126,6 +127,7 @@
             android:id="@+id/linearLayoutStars"
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -206,21 +208,63 @@
             </LinearLayout>
         </ScrollView>
 
-        <Button
-            android:id="@+id/button3"
-            style="@style/DefaultFont"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="25dp"
-            android:background="@drawable/btn_round"
-            android:backgroundTint="@color/boxColor"
-            android:onClick="reportarIncidenciaClick"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:text="@string/report"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/reportIncidentButton"
+                style="@style/DefaultFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_round"
+                android:backgroundTint="@color/boxColor"
+                android:onClick="reportarIncidenciaClick"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:text="@string/report"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/denyPetitionButton"
+                style="@style/DefaultFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_round"
+                android:backgroundTint="@android:color/holo_red_light"
+                android:onClick="denyPetition"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:text="@string/DenyRequest"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/acceptPetitionButton"
+                style="@style/DefaultFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_round"
+                android:backgroundTint="@android:color/holo_green_light"
+                android:onClick="acceptPetition"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:text="@string/AcceptRequest"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <fragment
             android:id="@+id/mapFuente"

@@ -46,4 +46,6 @@
     <string name="addWaterSource">Add water source</string>
     <string name="Incidents">Incidents</string>
     <string name="thanksPetition">Thank you. Your petition will be revised by moderators.</string>
+    <string name="AcceptRequest">Accept request</string>
+    <string name="DenyRequest">Deny request</string>
 </resources>

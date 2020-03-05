@@ -45,4 +45,6 @@
     <string name="addWaterSource">Añadir fuente</string>
     <string name="Incidents">Incidencias</string>
     <string name="thanksPetition">Gracias, La petición será revisada por los moderadores.</string>
+    <string name="AcceptRequest">Aceptar petición</string>
+    <string name="DenyRequest">Denegar petición</string>
 </resources>
